@@ -16,7 +16,7 @@ RUN set -eux; \
         libfreetype6-dev libjpeg62-turbo-dev libpng-dev libxml2-dev libonig-dev libzip-dev unzip; \
     docker-php-ext-configure gd --with-freetype --with-jpeg; \
     docker-php-ext-install -j"$(nproc)" bcmath gd mbstring mysqli opcache xml zip; \
-    a2enmod rewrite; \
+    a2enmod rewrite remoteip; \
     apt-get clean; rm -rf /var/lib/apt/lists/*
 
 # The release zip already contains vendor/ and the built assets. Copy only what upstream's

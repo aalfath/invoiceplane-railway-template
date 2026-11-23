@@ -93,6 +93,12 @@ chmod 0640 "$CONFIG"
 php /usr/local/bin/railway-db.php || fail "database setup failed"
 
 # 4. Apache on Railway's PORT, in the foreground.
+#    Railway's image unpacking can bring back mpm_event links the base image removed
+#    ("AH00534: More than one MPM loaded"); mod_php needs prefork, so keep only that one.
+for f in /etc/apache2/mods-enabled/mpm_*; do
+    case "$f" in */mpm_prefork.*) ;; *) [ -e "$f" ] || [ -L "$f" ] && rm "$f" ;; esac
+done
+[ -e /etc/apache2/mods-enabled/mpm_prefork.load ] || a2enmod -q mpm_prefork >/dev/null
 sed -ri "s/^Listen [0-9]+$/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -ri "s/<VirtualHost \*:[0-9]+>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-available/000-default.conf
 rm -f /var/run/apache2/apache2.pid

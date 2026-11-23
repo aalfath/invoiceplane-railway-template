@@ -43,6 +43,8 @@ chown -R www-data:www-data /data/uploads /data/storage /data/templates
 
 # 2. ipconfig.php (InvoicePlane's config file), regenerated on every start from the variables.
 #    Same keys as upstream's resources/docker/entrypoint.sh, plus the Railway proxy settings.
+#    SESS_MATCH_IP defaults to false here: visitors on mobile or carrier-grade NAT change IP
+#    between requests and would be logged out at random. Cookies stay Secure + HttpOnly.
 CONFIG=/var/www/html/ipconfig.php
 umask 027
 cat > "$CONFIG" <<CFG
@@ -69,7 +71,7 @@ CUSTOM_QUOTE_TEMPLATES_PDF=$(safe "${CUSTOM_QUOTE_TEMPLATES_PDF:-}")
 CUSTOM_QUOTE_TEMPLATES_PUBLIC=$(safe "${CUSTOM_QUOTE_TEMPLATES_PUBLIC:-}")
 SESS_SAVE_PATH=/data/storage/framework/sessions
 SESS_EXPIRATION=$(safe "${SESS_EXPIRATION:-864000}")
-SESS_MATCH_IP=$(safe "${SESS_MATCH_IP:-true}")
+SESS_MATCH_IP=$(safe "${SESS_MATCH_IP:-false}")
 COOKIE_SECURE=$(safe "${COOKIE_SECURE:-true}")
 PROXY_IPS=$(safe "${PROXY_IPS:-}")
 LEGACY_CALCULATION=$(safe "${LEGACY_CALCULATION:-false}")
